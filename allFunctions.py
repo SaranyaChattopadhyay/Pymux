@@ -18,10 +18,9 @@ def yumConfigurationLocal(ip):
     else:
         print("Yum configuration unsuccessful!")
 
-#Configyre and check yum configuration on remote machine
+#Configure and check yum configuration on remote machine
 def yumConfigureRemote(ip):
-    subprocess.run(['ssh', f'root@{ip}', 'mkdir', '/dvd', '&&', 'mount', '/dev/cdrom', '/dvd', '&&', 'echo', '"mount /dev/cdrom /dvd"', '>>', '/etc/rc.d/rc.local', '&&', 'chmod', '+x', '/etc/rc.d/rc.local', '&&', 'echo', '"[dvd1]"', '>>', '/etc/yum.repo.d/dvd.repo', '&&', 'echo', '"baseurl=file:///dvd/AppStream"', '>>', '/etc/yum.repo.d/dvd.repo', '&&', 'echo', '"gpgcheck=0"', '>>', '/etc/yum.repo.d/dvd.repo', '&&', 'echo', '"[dvd2]"', '>>', '/etc/yum.repo.d/dvd.repo', '&&', 'echo', '"baseurl=file:///dvd/BaseOS"', '>>', '/etc/yum.repo.d/dvd.repo', 'echo', '"gpgcheck=0"', '>>', '/etc/yum.repo.d/dvd.repo'])
-    output = subprocess.run(['yum', 'repolist'])
+    output = subprocess.run(['ssh', f'root@{ip}', 'mkdir', '/dvd', '&&', 'mount', '/dev/cdrom', '/dvd', '&&', 'echo', '"mount /dev/cdrom /dvd"', '>>', '/etc/rc.d/rc.local', '&&', 'chmod', '+x', '/etc/rc.d/rc.local', '&&', 'echo', '"[dvd1]"', '>>', '/etc/yum.repo.d/dvd.repo', '&&', 'echo', '"baseurl=file:///dvd/AppStream"', '>>', '/etc/yum.repo.d/dvd.repo', '&&', 'echo', '"gpgcheck=0"', '>>', '/etc/yum.repo.d/dvd.repo', '&&', 'echo', '"[dvd2]"', '>>', '/etc/yum.repo.d/dvd.repo', '&&', 'echo', '"baseurl=file:///dvd/BaseOS"', '>>', '/etc/yum.repo.d/dvd.repo', 'echo', '"gpgcheck=0"', '>>', '/etc/yum.repo.d/dvd.repo', '&&', 'yum', 'repolist'])
     if output.returncode == 0:
         print("Yum configuration successful!")
     else:
@@ -49,7 +48,7 @@ def webserverLocal(ip):
 
 #Create a new user user on local machine
 def userCreateLocal(username):
-    output = subprocess.run('sudo', 'useradd', f'{username}')
+    output = subprocess.run(['sudo', 'useradd', f'{username}'])
     if output.returncode == 0:
         print("User creation successful!")
     else:
@@ -57,7 +56,7 @@ def userCreateLocal(username):
 
 #Create a new user user on remote machine
 def userCreateRemote(ip, username):
-    output = subprocess.run('ssh', f'root@{ip}', 'useradd', f'{username}')
+    output = subprocess.run(['ssh', f'root@{ip}', 'useradd', f'{username}'])
     if output.returncode == 0:
         print("User creation successful!")
     else:
@@ -65,7 +64,7 @@ def userCreateRemote(ip, username):
 
 #Delete an existing user on local machine
 def userDelLocal(username):
-    output = subprocess.run('sudo', 'userdel', '-r', f'{username}')
+    output = subprocess.run(['sudo', 'userdel', '-r', f'{username}'])
     if output.returncode == 0:
         print("User deletion successful!")
     else:
@@ -73,14 +72,62 @@ def userDelLocal(username):
 
 #Delete an existing user user on remote machine
 def userCreateRemote(ip, username):
-    output = subprocess.run('ssh', f'root@{ip}', 'userdel', '-r', f'{username}')
+    output = subprocess.run(['ssh', f'root@{ip}', 'userdel', '-r', f'{username}'])
     if output.returncode == 0:
         print("User deletion successful!")
     else:
         print("User deletion unsuccessful!")
 
+#Create new folder on local machine
+def createFolderLocal(folder_path):
+    output = subprocess.run(['sudo', 'mkdir', '-p', f'{folder_path}'])
+    if output.returncode == 0:
+        print("Folder created successfully!")
+    else:
+        print("Folder creation unsuccessful!")
+
+#Create new folder on remote machine
+def createFolderRemote(ip, folder_path):
+    output = subprocess.run(['ssh', f'root@{ip}', 'mkdir', '-p', f'{folder_path}'])
+    if output.returncode == 0:
+        print("Folder created successfully!")
+    else:
+        print("Folder creation unsuccessful!")
+
+#Configure docker on local machine
+def confDockerLocal():
+    subprocess.run(['sudo', 'echo', '"[docker]"', '>>', '/etc/yum.repo.d/dockerRepo.repo'])
+    subprocess.run(['sudo', 'echo', '"baseurl=https://download.docker.com/linux/centos/7/x86_64/stable/"', '>>', '/etc/yum.repo.d/dockerRepo.repo'])
+    subprocess.run(['sudo', 'echo', '"gpgcheck=0"', '>>', '/etc/yum.repo.d/dockerRepo.repo'])
+    subprocess.run(['sudo', 'yum', 'install', 'docker-ce', '--nobest', '-y'])
+    output = subprocess.run(['sudo', 'systemctl', 'start', 'docker'])
+    if output.returncode == 0:
+        print("Docker configuration successful!")
+    else:
+        print("Docker configuration unsuccessful!")
+
+#Configure docker on remote machine
+def confDockerRemote(ip):
+    output = subprocess.run(['ssh', f'root@{ip}', 'echo', '"[docker]"', '>>', '/etc/yum.repo.d/dockerRepo.repo', '&&', 'echo', '"baseurl=https://download.docker.com/linux/centos/7/x86_64/stable/"', '>>', '/etc/yum.repo.d/dockerRepo.repo', '&&', 'echo', '"gpgcheck=0"', '>>', '/etc/yum.repo.d/dockerRepo.repo', '&&', 'yum', 'install', 'docker-ce', '--nobest', '-y', '&&', 'systemctl', 'start', 'docker'])
+    if output.returncode == 0:
+        print("Docker configuration successful!")
+    else:
+        print("Docker configuration unsuccessful!")
+
+#Run docker commands on local machine
+def runDockerLocal(command):
+    output = subprocess.getoutput(command)
+    print(output)
+
+#Run docker commands on remote machine
+def runDockerRemote(ip, command):
+    output = subprocess.getoutput(['ssh', f'root@{ip}', f'{command}'])
+    print(output)
+
+
+
 
 
 if __name__ == "__main__":
-    yumConfigureRemote("192.168.31.87")
+    pass
 
