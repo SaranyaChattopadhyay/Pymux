@@ -125,8 +125,56 @@ def runDockerRemote(ip, command):
     output = subprocess.getoutput(['ssh', f'root@{ip}', f'{command}'])
     print(output)
 
+#Create physical volume on local machine
+def createPVLocal(disk_name):
+    output = subprocess.run(['sudo', 'pvcreate', f'{disk_name}'])
+    if output.returncode == 0:
+        print("Physical volume successfully created!")
+    else:
+        print("Physical volume creation failed!")
+
+#Create physical volume on remote machine
+def createPVRemote(ip, disk_name):
+    output = subprocess.run(['ssh', f'root@{ip}', 'pvcreate', f'{disk_name}'])
+    if output.returncode == 0:
+        print("Physical volume successfully created!")
+    else:
+        print("Physical volume creation failed!")
+
+#Create volume group on local machine
+def createVGLocal(vgName, pv1, pv2):
+    output = subprocess.run(['sudo', 'vgcreate', f'{vgName}', f'{pv1}', f'{pv2}'])
+    if output.returncode == 0:
+        print("Volume group successfully created")
+    else:
+        print("Volume group creation failed")
+
+#Create volume group on remote machine
+def createVGRemote(ip, vgName, pv1, pv2):
+    output = subprocess.run(['ssh', f'root@{ip}', 'vgcreate', f'{vgName}', f'{pv1}', f'{pv2}'])
+    if output.returncode == 0:
+        print("Volume group successfully created")
+    else:
+        print("Volume group creation failed")
+
+#Create logical volume on local machine
+def createLVLocal(lvName, vgName, lvSize):
+    output = subprocess.run(['sudo', 'lvcreate', '--size', f'{lvSize}', '--name', f'{lvName}', f'{vgName}'])
+    if output.returncode == 0:
+        print("Logical volume successfully created")
+    else:
+        print("Logical volume creation failed")
+
+#Create logical volume on remote machine
+def createLVRemote(ip, lvName, vgName, lvSize):
+    output = subprocess.run(['ssh', f'root@{ip}', 'lvcreate', '--size', f'{lvSize}', '--name', f'{lvName}', f'{vgName}'])
+    if output.returncode == 0:
+        print("Logical volume successfully created")
+    else:
+        print("Logical volume creation failed")
+
 if __name__ == "__main__":
-    yumConfigurationLocal()
+    #yumConfigurationLocal()
     #yumConfigureRemote("192.168.29.22")
     #installPackageLocal()
     #installPackageRemote("192.168.29.22", "git")
@@ -142,6 +190,6 @@ if __name__ == "__main__":
     #confDockerRemote("192.168.29.22")
     #runDockerLocal()
     #runDockerRemote()
-
+    pass
 
 
